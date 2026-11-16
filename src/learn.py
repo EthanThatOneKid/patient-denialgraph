@@ -181,10 +181,10 @@ ax2.legend(loc="upper left", fontsize=9)
 fig.tight_layout()
 fig.savefig(os.path.join(WEB, "curve.png"), dpi=150)
 fig.savefig(os.path.join(DATA, "curve.png"), dpi=150)
-# SVG twin of the same chart (text, so it can go through the GitHub
-# connector, which rejects binaries): regenerate with src/build_curve_svg.py
-fig.savefig(os.path.join(WEB, "curve.svg"))
-fig.savefig(os.path.join(DATA, "curve.svg"))
+# NOTE: do NOT savefig curve.svg here. The SVG is generated from the same
+# data by src/build_curve_svg.py and is the file the README/demo link to;
+# a matplotlib savefig would silently overwrite that hand-built SVG on
+# every rerun (found by the Nov 15 E2E verification).
 print(f"\nBaseline acc {rows[0]['accuracy']:.3f} -> final acc {rows[-1]['accuracy']:.3f} "
       f"(+{(rows[-1]['accuracy']-rows[0]['accuracy'])*100:.1f} pts)")
 print(f"Patient net $ saved: ${rows[0]['dollars_saved_net']:,.2f} -> ${rows[-1]['dollars_saved_net']:,.2f}")
