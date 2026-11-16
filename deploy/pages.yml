@@ -1,0 +1,55 @@
+# GitHub Pages deploy for the static demo
+#
+# THIS FILE IS NOT IN .github/workflows/ ON PURPOSE.
+# The Muse GitHub App has no Workflows permission: pushing a file under
+# .github/workflows/ fails with 403. Ethan must add it himself:
+#
+#   mkdir -p .github/workflows
+#   cp deploy/pages.yml .github/workflows/pages.yml
+#   git add .github/workflows/pages.yml
+#   git commit -m "Add GitHub Pages deploy for the static demo"
+#   git push
+#
+# Then: repo Settings -> Pages -> Source: GitHub Actions (first time only),
+# then Actions -> "Deploy demo to GitHub Pages" -> Run workflow (manual —
+# push-triggered Pages deploys were flaky on etok.me on 2026-11-15:
+# deploy step found 0 artifacts, manual dispatch worked).
+#
+# Result: https://ethanthatonekid.github.io/patient-denialgraph/
+# The artifact is web/ as root, so index.html, demo_data.js and curve.png
+# are served at the site root with their relative paths intact.
+
+name: Deploy demo to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload demo
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

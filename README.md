@@ -61,6 +61,9 @@ or load a sample. It parses payer / CPT / denial code, walks the graph path,
 shows your win chance with and without the missing document, and drafts the
 appeal letter.
 
+Deploy: see [`DEPLOY.md`](DEPLOY.md) — GitHub Pages for the static demo
+first, live HydraDB 0.4.0 on Railway second.
+
 ## Stack
 
 - **HydraDB** ([hydra-db/hydradb](https://github.com/hydra-db/hydradb)) —
