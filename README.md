@@ -34,7 +34,7 @@ that won't win. Same money recovered, half the wasted effort. Each losing
 appeal costs a patient ~$35 of time/postage/phone calls (our model); at 40%
 precision the rule lookup burns most of its recommendations.
 
-![Learning curve](web/curve.png)
+![Learning curve](web/curve.svg)
 
 Full numbers: [`data/curve.csv`](data/curve.csv). Reproduce with
 `python3 src/generate_data.py && python3 src/learn.py`.
@@ -116,12 +116,12 @@ the Cypher is written to the docs and marked unexecuted.
 ```
 data/                 synthetic cases (cases.json), eval curve, denial letters
 src/generate_data.py  200 synthetic cases, 30 payer x CPT patterns
-src/learn.py          baseline vs 10-round learning loop + curve.png
+src/learn.py          baseline vs 10-round learning loop + curve.svg (and curve.png)
 src/ingest_selfgraph.py  SelfGraph ingest + versioning + answerability demo
 src/cypher.py         HydraDB Cypher schema + HTTP client (unexecuted, see findings)
 src/build_demo_data.py  embeds learned weights into the demo page
 web/index.html        one-page demo (paste a letter, get the path + appeal draft)
-web/curve.png         learning curve
+web/curve.svg         learning curve (SVG, text — pushable; PNG kept locally)
 HYDRA_FINDINGS.md     what we actually verified about HydraDB + SelfGraph
 ```
 

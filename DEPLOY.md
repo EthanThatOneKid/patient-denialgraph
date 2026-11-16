@@ -8,7 +8,7 @@ Nothing here is deployed yet. Nothing was pushed, posted, or submitted.
 **Static demo via GitHub Pages.** It is the only path that gives a
 submittable live link without a second account, a second service, or a
 server. The demo is static (`web/index.html` + `web/demo_data.js` +
-`web/curve.png`, no build step, all paths relative), and it was verified
+`web/curve.svg`, no build step, all paths relative), and it was verified
 locally on 2026-11-15: HTTP 200 for all three assets when served from
 `web/` as root.
 
@@ -67,7 +67,7 @@ re-run it manually once; do not push an empty commit to retry.
 ```bash
 curl -s -o /dev/null -w "index: %{http_code}\n" https://ethanthatonekid.github.io/patient-denialgraph/
 curl -s -o /dev/null -w "demo_data.js: %{http_code}\n" https://ethanthatonekid.github.io/patient-denialgraph/demo_data.js
-curl -s -o /dev/null -w "curve.png: %{http_code}\n" https://ethanthatonekid.github.io/patient-denialgraph/curve.png
+curl -s -o /dev/null -w "curve.svg: %{http_code}\n" https://ethanthatonekid.github.io/patient-denialgraph/curve.svg
 ```
 
 All three must be 200. Then open the page in a browser, click
@@ -156,7 +156,8 @@ submit a HydraDB URL you have not smoke-tested.
 ## No public preview link
 
 A self-contained single-file preview of the demo was built locally
-(`web/index.html` + inlined `demo_data.js` + base64 `curve.png`,
+(`web/index.html` + inlined `demo_data.js` + base64 `curve.png`; the PNG
+predates the SVG switch,
 165,816 bytes, served locally with HTTP 200) and offered for upload
 to Hatch storage for a public preview link. The upload was **declined
 by Ethan** (approval denied, 2026-11-15 ~4:10pm PT). It was not
