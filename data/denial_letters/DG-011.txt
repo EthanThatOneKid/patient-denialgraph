@@ -1,0 +1,14 @@
+Dear James W.,
+
+We have reviewed your claim CLM-100010 for services on 2026-04-28.
+Your Electrocardiogram (CPT 93000) for Atherosclerotic heart disease (ICD I25.10) has been denied by UnitedHealthcare.
+
+Reason: Out of network (code CO-109).
+Policy: OON-12 — Service outside network without referral.
+Billed amount: $200.05. Patient responsibility if unpaid: $200.05.
+
+You have the right to appeal within 180 days. An appeal is most likely to succeed if you include: in-network exception / continuity-of-care letter.
+Appeal address: UnitedHealthcare Appeals Department, PO Box 1000.
+
+Sincerely,
+UnitedHealthcare Claims Review

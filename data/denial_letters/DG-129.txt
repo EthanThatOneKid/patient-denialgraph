@@ -1,0 +1,14 @@
+Dear Tom P.,
+
+We have reviewed your claim CLM-100128 for services on 2026-02-11.
+Your Office visit, established patient (CPT 99214) for Low back pain (ICD M54.5) has been denied by UnitedHealthcare.
+
+Reason: Not medically necessary as coded (code CO-50).
+Policy: MEDNEC-22 — Visit must document medical necessity for level-4 coding.
+Billed amount: $222.56. Patient responsibility if unpaid: $222.56.
+
+You have the right to appeal within 180 days. An appeal is most likely to succeed if you include: clinical notes supporting level 4.
+Appeal address: UnitedHealthcare Appeals Department, PO Box 1000.
+
+Sincerely,
+UnitedHealthcare Claims Review

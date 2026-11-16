@@ -1,0 +1,14 @@
+Dear Sam G.,
+
+We have reviewed your claim CLM-100022 for services on 2026-08-11.
+Your Electrocardiogram (CPT 93000) for Atherosclerotic heart disease (ICD I25.10) has been denied by Cigna.
+
+Reason: Out of network (code CO-109).
+Policy: OON-12 — Service outside network without referral.
+Billed amount: $205.63. Patient responsibility if unpaid: $205.63.
+
+You have the right to appeal within 180 days. An appeal is most likely to succeed if you include: in-network exception / continuity-of-care letter.
+Appeal address: Cigna Appeals Department, PO Box 1000.
+
+Sincerely,
+Cigna Claims Review

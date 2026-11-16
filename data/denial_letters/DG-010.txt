@@ -1,0 +1,14 @@
+Dear Priya T.,
+
+We have reviewed your claim CLM-100009 for services on 2026-04-25.
+Your Comprehensive metabolic panel (CPT 80053) for Type 2 diabetes (ICD E11.9) has been denied by UnitedHealthcare.
+
+Reason: Duplicate claim (code CO-18).
+Policy: DUP-07 — Same lab on same date already paid.
+Billed amount: $95.58. Patient responsibility if unpaid: $95.58.
+
+You have the right to appeal within 180 days. An appeal is most likely to succeed if you include: proof this was a distinct repeat test.
+Appeal address: UnitedHealthcare Appeals Department, PO Box 1000.
+
+Sincerely,
+UnitedHealthcare Claims Review

@@ -1,0 +1,16 @@
+# Python / venv
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# SelfGraph embedded Kuzu store (16MB binary dir, rebuildable via src/ingest_selfgraph.py)
+data/selfgraph-kuzu
+
+# OS / editor
+.DS_Store
+*.swp
+*~
+
+# Local env
+.env

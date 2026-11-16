@@ -1,0 +1,14 @@
+Dear James L.,
+
+We have reviewed your claim CLM-100104 for services on 2026-07-13.
+Your Office visit, established patient (CPT 99214) for Low back pain (ICD M54.5) has been denied by Blue Cross Blue Shield.
+
+Reason: Not medically necessary as coded (code CO-50).
+Policy: MEDNEC-22 — Visit must document medical necessity for level-4 coding.
+Billed amount: $238.52. Patient responsibility if unpaid: $238.52.
+
+You have the right to appeal within 180 days. An appeal is most likely to succeed if you include: clinical notes supporting level 4.
+Appeal address: Blue Cross Blue Shield Appeals Department, PO Box 1000.
+
+Sincerely,
+Blue Cross Blue Shield Claims Review

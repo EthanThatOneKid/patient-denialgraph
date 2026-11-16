@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DenialGraph-lite — patient-first claim denial appeals</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; line-height: 1.5; color: #1a1a1a; }
+  h1 { font-size: 28px; margin-bottom: 4px; }
+  h2 { font-size: 20px; margin-top: 36px; border-top: 1px solid #ddd; padding-top: 16px; }
+  .sub { color: #555; margin-top: 0; }
+  textarea { width: 100%; min-height: 220px; font-family: monospace; font-size: 13px; padding: 10px; box-sizing: border-box; }
+  button { background: #14532d; color: #fff; border: 0; padding: 10px 18px; font-size: 15px; border-radius: 6px; cursor: pointer; margin: 8px 8px 0 0; }
+  button.secondary { background: #e5e5e5; color: #1a1a1a; }
+  .path { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0; }
+  .node { background: #dcfce7; border: 1px solid #86efac; border-radius: 6px; padding: 6px 10px; font-size: 14px; }
+  .node b { display: block; font-size: 11px; text-transform: uppercase; color: #166534; }
+  .arrow { color: #888; }
+  .stat { display: inline-block; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 16px; margin: 6px 6px 0 0; }
+  .stat b { font-size: 24px; display: block; }
+  .stat span { font-size: 13px; color: #555; }
+  .verdict { font-size: 18px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; }
+  pre { background: #f8f8f8; border: 1px solid #ddd; border-radius: 8px; padding: 14px; white-space: pre-wrap; font-size: 13px; }
+  img { max-width: 100%; }
+  .note { background: #f1f5f9; border-left: 4px solid #64748b; padding: 10px 14px; font-size: 14px; }
+  .hidden { display: none; }
+  code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<h1>DenialGraph-lite</h1>
+<p class="sub">Patient-first claim denial appeals, on a self-improving graph. HydraDB Hackathon — Track 1: the self-improving graph. Built on <a href="https://github.com/hydra-db/selfgraph">SelfGraph</a> + <a href="https://github.com/hydra-db/hydradb">HydraDB</a>. All data here is synthetic — no real PHI.</p>
+
+<h2>1. Paste your denial letter</h2>
+<p>Paste the letter (or EOB) your insurer sent you. We pull out the payer, procedure code, and denial reason, walk the graph, and tell you why it was denied — and what actually wins appeals for cases like yours.</p>
+<textarea id="letter" placeholder="Paste your denial letter here…"></textarea><br>
+<button onclick="analyze()">Analyze my denial</button>
+<button class="secondary" onclick="loadSample(0)">Sample: MRI denied, no prior auth</button>
+<button class="secondary" onclick="loadSample(1)">Sample: injection denied, experimental</button>
+<button class="secondary" onclick="loadSample(2)">Sample: visit denied, not medically necessary</button>
+
+<div id="result" class="hidden">
+  <h2>2. Why it was denied — the graph path</h2>
+  <div class="path" id="path"></div>
+  <div class="verdict" id="verdict"></div>
+
+  <h2>3. Your appeal, and what wins</h2>
+  <p id="appeal-stats"></p>
+  <p><b>One thing to attach:</b> <span id="missing-doc"></span></p>
+  <pre id="draft"></pre>
+  <button onclick="copyDraft()">Copy appeal letter</button>
+</div>
+
+<h2>4. The graph learns from appeals</h2>
+<p>Frozen 40-case eval set, never used for training. Baseline = payer rule lookup (the static-rules approach). Each learning round ingests 16 more appeal outcomes: edge reweighting on wins/losses, path compression of frequent denial chains, and gap-driven questions for the one missing document.</p>
+<img src="curve.png" alt="Accuracy curve rising over learning rounds">
+<p>
+  <span class="stat"><b id="acc-from"></b><span>baseline accuracy</span></span>
+  <span class="stat"><b id="acc-to"></b><span>accuracy after 10 rounds</span></span>
+  <span class="stat"><b id="prec"></b><span>appeal precision</span></span>
+  <span class="stat"><b id="appeals"></b><span>appeals filed (eval set)</span></span>
+</p>
+<p class="note">Patient-first read: the learned graph recovers about the same money as the rule lookup
+(<span id="dollars"></span> on the eval set) while filing half as many appeals — precision 40% → 70%.
+Fewer wasted appeals is the win for a patient: each losing appeal costs time, postage, and phone calls.</p>
+
+<h2>How it works</h2>
+<ul>
+  <li><b>Ingest:</b> denial letters and EOBs go in as unstructured text via SelfGraph (light level: deterministic regex extraction, no LLM). Every fact keeps its source letter.</li>
+  <li><b>Store:</b> HydraDB (open-source graph DB, Rust + SlateDB, OpenCypher/Bolt). Schema in <code>src/cypher.py</code>. SelfGraph's HydraDBStore needs HydraDB ≥ 0.4.0 — v0.4.0 shipped Nov 14, 2026, and <code>ghcr.io/hydra-db/hydradb:0.4.0</code> exists.</li>
+  <li><b>Learn:</b> appeal outcomes reweight the (payer, CPT, denial) edge; chains seen ≥ 5× get a compressed shortcut edge; when the supporting document is missing, the graph asks for exactly that one document.</li>
+  <li><b>Versioning:</b> when a payer retires a policy, the old rule is retired, not deleted — the graph answers as-of any past date. Demoed in <code>src/ingest_selfgraph.py</code>.</li>
+</ul>
+<p class="note"><b>Honest status:</b> SelfGraph + embedded Kuzu is verified working end-to-end here (200 letters ingested, 385 entities, 291 relations, retrieval + answerability checks pass). A live HydraDB 0.4.0 server was <i>not</i> run in this sandbox — no Docker, no Rust toolchain, and apt stalled — so the Cypher in <code>src/cypher.py</code> is written to the docs and unexecuted. See <code>HYDRA_FINDINGS.md</code> for the full verification log.</p>
+
+<script src="demo_data.js"></script>
+<script>
+const D = window.DENIALGRAPH;
+const PAYERS = ["Aetna", "UnitedHealthcare", "Blue Cross Blue Shield", "Cigna", "Kaiser Permanente"];
+const DENIALS = [
+  ["prior authorization", "No prior authorization"],
+  ["experimental", "Experimental / investigational"],
+  ["not medically necessary", "Not medically necessary as coded"],
+  ["duplicate", "Duplicate claim"],
+  ["out of network", "Out of network"],
+  ["timely filing", "Timely filing exceeded"],
+];
+function loadSample(i) {
+  document.getElementById("letter").value = D.samples[i].letter;
+  analyze();
+}
+function parseLetter(text) {
+  const payer = PAYERS.find(p => text.includes(p)) || "Unknown payer";
+  const cpt = (text.match(/CPT (\d{5})/) || [])[1] || "";
+  const code = (text.match(/\(code (CO-\d+)\)/) || [])[1] || "";
+  const billed = (text.match(/Billed amount: \$([\d,]+\.\d{2})/) || [])[1] || "";
+  const denial = (DENIALS.find(([kw]) => text.toLowerCase().includes(kw)) || [])[1] || "";
+  const claim = (text.match(/claim (CLM-\d+)/) || [])[1] || "your claim";
+  return { payer, cpt, code, billed, denial, claim };
+}
+function analyze() {
+  const text = document.getElementById("letter").value.trim();
+  if (!text) { alert("Paste a denial letter first (or load a sample)."); return; }
+  const p = parseLetter(text);
+  const key = `${p.payer}|${p.cpt}|${p.denial}`;
+  const pat = D.patterns[key];
+  const sample = D.samples.find(s => s.cpt === p.cpt && s.payer === p.payer);
+  const policyId = sample ? sample.policyId : "—";
+  const policyText = sample ? sample.policyText : "—";
+  const missingDoc = sample ? sample.missingDoc : "the supporting document for this denial";
+  const cptName = sample ? sample.cptName : "procedure " + p.cpt;
+
+  const nodes = [
+    ["Claim", p.claim], ["CPT", `${p.cpt} ${cptName}`], ["Payer", p.payer],
+    ["Policy", `${policyId} — ${policyText}`], ["Denial", `${p.denial} (${p.code})`],
+    ["Missing doc", missingDoc],
+  ];
+  document.getElementById("path").innerHTML = nodes.map(([k, v]) =>
+    `<span class="node"><b>${k}</b>${v}</span>`).join('<span class="arrow">→</span>');
+
+  if (pat) {
+    const asIs = 0.6 * pat.winRate + 0.4 * D.docRates.missing.winRate;
+    const withDoc = 0.6 * pat.winRate + 0.4 * D.docRates.supplied.winRate;
+    document.getElementById("verdict").innerHTML =
+      `Your claim was denied as <b>${p.denial}</b> under ${p.payer} policy ${policyId}. ` +
+      `For ${p.payer} + CPT ${p.cpt} + this denial, <b>${pat.wins} of ${pat.total}</b> similar appeals in our graph won. ` +
+      `As things stand (document missing), your appeal win chance is about <b>${Math.round(asIs * 100)}%</b>. ` +
+      `If you attach the <b>${missingDoc}</b>, it rises to about <b>${Math.round(withDoc * 100)}%</b> — ` +
+      `patients with the document win ${Math.round(D.docRates.supplied.winRate * 100)}% of the time, vs ${Math.round(D.docRates.missing.winRate * 100)}% without it.`;
+    document.getElementById("appeal-stats").innerHTML =
+      `Appeals like yours win <b>${Math.round(pat.winRate * 100)}%</b> of the time when the evidence is attached ` +
+      `(${pat.wins}/${pat.total} in the graph). Billed amount at stake: <b>$${p.billed || (sample ? sample.billed : "?")}</b>.`;
+  } else {
+    document.getElementById("verdict").innerHTML =
+      `We found payer <b>${p.payer}</b>, CPT <b>${p.cpt}</b>, denial <b>${p.denial || "unknown"}</b>, ` +
+      `but no exact precedent in the graph for this combination — the graph would flag this as a gap and ask for the policy text. ` +
+      `Try one of the samples to see a full precedent-backed answer.`;
+    document.getElementById("appeal-stats").innerHTML = "";
+  }
+  document.getElementById("missing-doc").textContent = missingDoc;
+  document.getElementById("draft").textContent =
+`[Your name]
+[Your address]
+[Date]
+
+${p.payer} Appeals Department
+PO Box 1000
+
+Re: Appeal of denied claim ${p.claim} — CPT ${p.cpt} (${cptName}), denial ${p.code}
+
+Dear Appeals Reviewer,
+
+I am appealing the denial of ${p.claim} for ${cptName} (CPT ${p.cpt}).
+The denial states "${p.denial}" under policy ${policyId}.
+
+This service was medically necessary, and I am enclosing the supporting
+documentation: ${missingDoc}.
+
+Similar appeals for this payer, procedure, and denial reason have
+succeeded when this documentation is provided. Please reconsider the
+claim and approve payment of $${p.billed || (sample ? sample.billed : "[amount]")}.
+
+Thank you for your review.
+
+Sincerely,
+[Your name] — [Member ID] — [Phone]`;
+  document.getElementById("result").classList.remove("hidden");
+}
+function copyDraft() {
+  navigator.clipboard.writeText(document.getElementById("draft").textContent);
+  alert("Appeal letter copied.");
+}
+// curve stats
+const c0 = D.curve[0], cN = D.curve[D.curve.length - 1];
+document.getElementById("acc-from").textContent = Math.round(c0.accuracy * 100) + "%";
+document.getElementById("acc-to").textContent = Math.round(cN.accuracy * 100) + "%";
+document.getElementById("prec").textContent = Math.round(c0.appeal_precision * 100) + "% → " + Math.round(cN.appeal_precision * 100) + "%";
+document.getElementById("appeals").textContent = c0.recommended + " → " + cN.recommended;
+document.getElementById("dollars").textContent = "$" + cN.dollars_saved_net.toLocaleString();
+document.getElementById("letter").value = D.samples[0].letter;
+</script>
+</body>
+</html>

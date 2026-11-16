@@ -1,0 +1,123 @@
+[
+  {
+    "round": 0,
+    "mode": "baseline rule lookup",
+    "accuracy": 0.575,
+    "appeal_precision": 0.4,
+    "recommended": 20,
+    "dollars_saved_gross": 7127.38,
+    "dollars_saved_net": 6707.38,
+    "shortcuts": 0,
+    "patterns_learned": 0
+  },
+  {
+    "round": 1,
+    "mode": "learning",
+    "accuracy": 0.625,
+    "appeal_precision": 0.25,
+    "recommended": 4,
+    "dollars_saved_gross": 1486.44,
+    "dollars_saved_net": 1381.44,
+    "shortcuts": 0,
+    "patterns_learned": 16
+  },
+  {
+    "round": 2,
+    "mode": "learning",
+    "accuracy": 0.625,
+    "appeal_precision": 0.4,
+    "recommended": 10,
+    "dollars_saved_gross": 4991.74,
+    "dollars_saved_net": 4781.74,
+    "shortcuts": 0,
+    "patterns_learned": 30
+  },
+  {
+    "round": 3,
+    "mode": "learning",
+    "accuracy": 0.725,
+    "appeal_precision": 0.667,
+    "recommended": 6,
+    "dollars_saved_gross": 4991.74,
+    "dollars_saved_net": 4921.74,
+    "shortcuts": 0,
+    "patterns_learned": 30
+  },
+  {
+    "round": 4,
+    "mode": "learning",
+    "accuracy": 0.725,
+    "appeal_precision": 1.0,
+    "recommended": 2,
+    "dollars_saved_gross": 2353.64,
+    "dollars_saved_net": 2353.64,
+    "shortcuts": 0,
+    "patterns_learned": 30
+  },
+  {
+    "round": 5,
+    "mode": "learning",
+    "accuracy": 0.725,
+    "appeal_precision": 0.667,
+    "recommended": 6,
+    "dollars_saved_gross": 4755.93,
+    "dollars_saved_net": 4685.93,
+    "shortcuts": 0,
+    "patterns_learned": 30
+  },
+  {
+    "round": 6,
+    "mode": "learning",
+    "accuracy": 0.725,
+    "appeal_precision": 0.667,
+    "recommended": 6,
+    "dollars_saved_gross": 4755.93,
+    "dollars_saved_net": 4685.93,
+    "shortcuts": 0,
+    "patterns_learned": 30
+  },
+  {
+    "round": 7,
+    "mode": "learning",
+    "accuracy": 0.725,
+    "appeal_precision": 0.667,
+    "recommended": 6,
+    "dollars_saved_gross": 4755.93,
+    "dollars_saved_net": 4685.93,
+    "shortcuts": 0,
+    "patterns_learned": 30
+  },
+  {
+    "round": 8,
+    "mode": "learning",
+    "accuracy": 0.75,
+    "appeal_precision": 0.714,
+    "recommended": 7,
+    "dollars_saved_gross": 4978.26,
+    "dollars_saved_net": 4908.26,
+    "shortcuts": 8,
+    "patterns_learned": 30
+  },
+  {
+    "round": 9,
+    "mode": "learning",
+    "accuracy": 0.775,
+    "appeal_precision": 0.7,
+    "recommended": 10,
+    "dollars_saved_gross": 6791.3,
+    "dollars_saved_net": 6686.3,
+    "shortcuts": 24,
+    "patterns_learned": 30
+  },
+  {
+    "round": 10,
+    "mode": "learning",
+    "accuracy": 0.775,
+    "appeal_precision": 0.7,
+    "recommended": 10,
+    "dollars_saved_gross": 6791.3,
+    "dollars_saved_net": 6686.3,
+    "shortcuts": 30,
+    "patterns_learned": 30
+  }
+]

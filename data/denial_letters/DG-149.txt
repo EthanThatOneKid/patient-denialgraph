@@ -1,0 +1,14 @@
+Dear Tom W.,
+
+We have reviewed your claim CLM-100148 for services on 2026-10-08.
+Your Electrocardiogram (CPT 93000) for Atherosclerotic heart disease (ICD I25.10) has been denied by Kaiser Permanente.
+
+Reason: Out of network (code CO-109).
+Policy: OON-12 — Service outside network without referral.
+Billed amount: $171.25. Patient responsibility if unpaid: $171.25.
+
+You have the right to appeal within 180 days. An appeal is most likely to succeed if you include: in-network exception / continuity-of-care letter.
+Appeal address: Kaiser Permanente Appeals Department, PO Box 1000.
+
+Sincerely,
+Kaiser Permanente Claims Review
