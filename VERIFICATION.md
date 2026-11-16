@@ -1,11 +1,16 @@
 # End-to-end verification — patient-denialgraph
 
 **Verdict: the app works as intended, end to end, on the verified scope below.
-24 of 25 checks passed on first run; the 1 failure was a real defect, fixed
-and re-verified (see §4).**
+25 of 25 top-level checks passed on the latest run (Nov 15, ~5:35pm PT).**
+The node demo test (one top-level check) contains 11 sub-checks, all
+passing; they are listed as rows 15–22 below. An earlier run (Nov 15,
+~5:00pm PT) was 24 of 25; the 1 failure was a real defect, fixed and
+re-verified (see §4). A second earlier failure in the same run was a stale
+hardcoded commit SHA in the harness itself, fixed by reading the expected
+head from the sync record.
 
-- Verified: Sun Nov 15, 2026, ~5:00–5:05pm PT (01:01–01:02 UTC Nov 16)
-- Verified against: GitHub `main` at `97df2cb0` (the SVG-switch commit)
+- Verified: Sun Nov 15, 2026, ~5:35pm PT (01:35 UTC Nov 16) — second full run
+- Verified against: GitHub `main` at `fcf3b3a` (the verification commit)
 - Method: clean-room copy of the repo (no `.git`, no `.venv`, no existing
   Kuzu store), rebuilt from scratch and re-run. Scripts:
   [`scripts/verify_e2e.sh`](scripts/verify_e2e.sh) (bash driver, writes
@@ -45,11 +50,13 @@ and re-verified (see §4).**
 | 18 | All 3 samples: parse → precedent → path + verdict + appeal draft | PASS | 3/3 with an exact graph precedent; path shows Claim → CPT → Payer → Policy → Denial → Missing doc; draft contains the missing document |
 | 19 | Unknown combination yields the gap message, invents nothing | PASS | "no exact precedent in the graph"; no win-chance % invented |
 | 20 | Doc rates match the headline | PASS | supplied ≈45.5% vs missing ≈10.6% |
-| 21 | Demo serves over HTTP: `/`, `/demo_data.js`, `/curve.svg` | PASS | HTTP 200 for all three |
-| 22 | `index.html` references `curve.svg`; served file is SVG | PASS | `src="curve.svg"`, valid SVG |
-| 23 | GitHub `main` head is `97df2cb0` | PASS | `list_commits`, head SHA match |
-| 24 | Key files present on GitHub `main` | PASS | `web/curve.svg`, `web/index.html`, `README.md`, `data/curve.csv`, `DEPLOY.md`, `DEMO_SCRIPT.md` — all read back |
-| 25 | GitHub Pages live URL | NOT LIVE (expected) | `https://ethanthatonekid.github.io/patient-denialgraph/` → HTTP 404. Pages workflow not yet added/enabled — Ethan-only item, not an app failure |
+| 21 | Draft is an editable textarea, with revise buttons | PASS | `<textarea id="draft">` in the page (not a read-only `<pre>`); Shorter / Firmer / Emphasize the document / Reset buttons present |
+| 22 | Draft iteration: edit, revise, stack, reset, copy | PASS | patient edit survives revises; Shorter drops the similar-appeals paragraph + thank-you line and shortens the draft; Firmer adds the full-review ask, 30-day deadline, and external-review step (idempotent, single copy); Emphasize adds the document paragraph (idempotent); Shorter then Firmer stacks; Reset restores the original; Copy copies the current edited draft; re-analyze regenerates from scratch |
+| 23 | Demo serves over HTTP: `/`, `/demo_data.js`, `/curve.svg` | PASS | HTTP 200 for all three |
+| 24 | `index.html` references `curve.svg`; served file is SVG | PASS | `src="curve.svg"`, valid SVG |
+| 25 | GitHub `main` head matches the last confirmed push | PASS | `list_commits`, head SHA match against the sync record |
+| 26 | Key files present on GitHub `main` | PASS | `web/curve.svg`, `web/index.html`, `README.md`, `data/curve.csv`, `DEPLOY.md`, `DEMO_SCRIPT.md` — all read back |
+| 27 | GitHub Pages live URL | NOT LIVE (expected) | `https://ethanthatonekid.github.io/patient-denialgraph/` → HTTP 404. Pages workflow not yet added/enabled — Ethan-only item, not an app failure |
 
 ## 2. What "working" means here, precisely
 
@@ -70,6 +77,11 @@ and re-verified (see §4).**
   learned patterns, quotes a win chance with and without the missing
   document, and drafts a copyable appeal. An unmatched combination says
   so instead of inventing a precedent.
+- The appeal draft is iterable: it renders as an editable textarea, and
+  Shorter / Firmer / Emphasize the document revise the current draft
+  (stacking, idempotent where it matters), Reset restores the generated
+  original, and Copy copies whatever the draft currently says, edits
+  included. Re-analyzing regenerates the draft from scratch.
 
 ## 3. Honest notes (not failures)
 
@@ -103,7 +115,21 @@ Fix (commit `ba5e3be`): the `savefig` SVG lines are removed from
 `learn.py`; the SVG's source of truth is `src/build_curve_svg.py`.
 Re-verified in a fresh clean room: a `learn.py` rerun now leaves
 `web/curve.svg` and `data/curve.svg` byte-identical, and `curve.csv` /
-`curve.json` / `curve.png` identical too.
+`curve.json` / `curve.png` identical too. The check still passes in the
+latest run (row 7).
+
+**New in this run: draft iteration (rows 21–22).** The appeal draft was
+read-only text (`<pre>`) with a copy button only — no editing, no revise
+loop. It is now an editable textarea with Shorter / Firmer / Emphasize
+the document / Reset actions, verified by the extended node test
+(`scripts/verify_demo_test.js`): patient edits survive revises, Firmer
+and Emphasize are idempotent, revises stack, Reset restores the original,
+Copy copies the edited draft, and re-analyzing regenerates from scratch.
+
+**Harness fix.** The first run of this second verification failed its
+GitHub-head check only because the expected SHA was hardcoded to the
+older `97df2cb0`. The script now reads the expected head from the sync
+record (the last confirmed push), so the check stays valid across pushes.
 
 ## 5. Explicitly NOT verified (out of scope for this run)
 

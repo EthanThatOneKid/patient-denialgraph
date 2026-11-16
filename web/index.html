@@ -47,8 +47,15 @@
   <h2>3. Your appeal, and what wins</h2>
   <p id="appeal-stats"></p>
   <p><b>One thing to attach:</b> <span id="missing-doc"></span></p>
-  <pre id="draft"></pre>
-  <button onclick="copyDraft()">Copy appeal letter</button>
+  <p><b>Your appeal draft</b> — edit it directly below, or use the revise buttons. Each button revises the current draft, so they stack: Shorter, then Firmer, then Reset to start over. Re-analyzing regenerates the draft from scratch.</p>
+  <textarea id="draft" rows="18"></textarea>
+  <div>
+    <button class="secondary" onclick="reviseShorter()">Shorter</button>
+    <button class="secondary" onclick="reviseFirmer()">Firmer</button>
+    <button class="secondary" onclick="reviseEmphasizeDoc()">Emphasize the document</button>
+    <button class="secondary" onclick="resetDraft()">Reset to original</button>
+    <button onclick="copyDraft()">Copy appeal letter</button>
+  </div>
 </div>
 
 <h2>4. The graph learns from appeals</h2>
@@ -76,6 +83,10 @@ Fewer wasted appeals is the win for a patient: each losing appeal costs time, po
 <script src="demo_data.js"></script>
 <script>
 const D = window.DENIALGRAPH;
+// Draft-revision state: the generated draft (reset target) and the missing
+// document for the current analysis (used by "Emphasize the document").
+let originalDraft = "";
+let lastMissingDoc = "";
 const PAYERS = ["Aetna", "UnitedHealthcare", "Blue Cross Blue Shield", "Cigna", "Kaiser Permanente"];
 const DENIALS = [
   ["prior authorization", "No prior authorization"],
@@ -138,7 +149,8 @@ function analyze() {
     document.getElementById("appeal-stats").innerHTML = "";
   }
   document.getElementById("missing-doc").textContent = missingDoc;
-  document.getElementById("draft").textContent =
+  const draftEl = document.getElementById("draft");
+  draftEl.value =
 `[Your name]
 [Your address]
 [Date]
@@ -164,10 +176,49 @@ Thank you for your review.
 
 Sincerely,
 [Your name] — [Member ID] — [Phone]`;
+  originalDraft = draftEl.value;
+  lastMissingDoc = missingDoc;
   document.getElementById("result").classList.remove("hidden");
 }
+function reviseShorter() {
+  // Drop the "similar appeals" paragraph and the thank-you line.
+  // Deterministic text edit on the current draft, so it stacks with edits.
+  const el = document.getElementById("draft");
+  let t = el.value;
+  t = t.replace(/Similar appeals for this payer, procedure, and denial reason have\s+succeeded when this documentation is provided\. /, "");
+  t = t.replace(/Thank you for your review\.\n\n/, "");
+  el.value = t;
+}
+function reviseFirmer() {
+  // Stronger ask, a 30-day deadline, and the external-review next step.
+  // Idempotent: a second click changes nothing.
+  const el = document.getElementById("draft");
+  let t = el.value;
+  t = t.replace(/Please reconsider the\s+claim and approve payment of (\$[\d,\.]+|\$\[amount\])\./,
+    "I request a full review and reversal of this denial, and payment of $1.");
+  t = t.replace("Thank you for your review.", "I expect a written decision within 30 days.");
+  if (!t.includes("external review")) {
+    t = t.replace("\nSincerely,", "\nIf this appeal is denied, I will request an external review.\n\nSincerely,");
+  }
+  el.value = t;
+}
+function reviseEmphasizeDoc() {
+  // Add a paragraph making the missing document the center of the appeal.
+  // Idempotent: a second click changes nothing.
+  const el = document.getElementById("draft");
+  let t = el.value;
+  if (t.includes("is the document the denial turns on")) { el.value = t; return; }
+  const doc = lastMissingDoc || "the supporting document";
+  t = t.replace(/(documentation: [^\n]+\n)/,
+    "$1\nThe enclosed " + doc + " is the document the denial turns on. " +
+    "Without it the claim was denied; with it, similar appeals for this payer, procedure, and denial have succeeded.\n");
+  el.value = t;
+}
+function resetDraft() {
+  document.getElementById("draft").value = originalDraft;
+}
 function copyDraft() {
-  navigator.clipboard.writeText(document.getElementById("draft").textContent);
+  navigator.clipboard.writeText(document.getElementById("draft").value);
   alert("Appeal letter copied.");
 }
 // curve stats

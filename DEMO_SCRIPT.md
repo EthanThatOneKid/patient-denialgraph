@@ -31,7 +31,7 @@ It shows the path. Claim to CPT code to payer to policy to denial reason. You ca
 
 With that document, the win chance in our test data is 45.5 percent. Without it, it is 10.6 percent. That is the whole point. The graph asks for the one thing that matters.
 
-Then it drafts the appeal. You can copy it, edit it, and send it.
+Then it drafts the appeal. You can edit it right in the page, hit Shorter or Firmer or Emphasize the document to revise it, then copy it and send it.
 
 ## 1:30-2:15 — It learns
 

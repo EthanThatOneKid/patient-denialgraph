@@ -118,8 +118,11 @@ curl -s http://127.0.0.1:8137/curve.svg | head -c 1000 | grep -q "<svg" && echo 
 kill $SRV 2>/dev/null
 
 # --- 7. remote GitHub state ---
+# Expected head = the last confirmed push in the sync record (the script
+# runs before the next push, so a hardcoded SHA goes stale after any push).
+EXPECTED_HEAD=$(python3 -c "import json; print(json.load(open('$HOME/workspace/hydradb-denialgraph.muse-github-snapshot-sync.json'))[-1]['commit_sha'])")
 /opt/hatch/bin/github call-read-tool --name list_commits --arguments-json '{"owner":"EthanThatOneKid","repo":"patient-denialgraph","branch":"main","perPage":1}' > /tmp/verify-gh.json 2>&1
-grep -q "97df2cb0cba2e9d5231ff67216c5cd76e4ebbce8" /tmp/verify-gh.json && echo "PASS: GitHub main head is 97df2cb0 (SVG switch)" && PASS=$((PASS+1)) || { echo "FAIL: GitHub head is not 97df2cb0"; FAIL=$((FAIL+1)); grep -o '"sha":"[0-9a-f]*"' /tmp/verify-gh.json | head -1; }
+grep -q "$EXPECTED_HEAD" /tmp/verify-gh.json && echo "PASS: GitHub main head matches last confirmed push ($EXPECTED_HEAD)" && PASS=$((PASS+1)) || { echo "FAIL: GitHub head is not $EXPECTED_HEAD (last confirmed push)"; FAIL=$((FAIL+1)); grep -o '"sha":"[0-9a-f]*"' /tmp/verify-gh.json | head -1; }
 for p in web/curve.svg web/index.html README.md data/curve.csv DEPLOY.md DEMO_SCRIPT.md; do
   /opt/hatch/bin/github call-read-tool --name get_file_contents --arguments-json "{\"owner\":\"EthanThatOneKid\",\"repo\":\"patient-denialgraph\",\"path\":\"$p\",\"branch\":\"main\"}" > /tmp/verify-gh-file.json 2>&1
   grep -q "successfully downloaded" /tmp/verify-gh-file.json && echo "PASS: $p present on GitHub main" && PASS=$((PASS+1)) || { echo "FAIL: $p missing on GitHub main"; FAIL=$((FAIL+1)); }
